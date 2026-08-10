@@ -30,8 +30,7 @@ import time
 from contextlib import closing
 
 from aiogram import Bot, Dispatcher, F, Router
-from aiogram.client.default import DefaultBotProperties
-from aiogram.enums import ChatMemberStatus, ParseMode
+from aiogram.enums import ChatMemberStatus
 from aiogram.filters import Command
 from aiogram.types import Message
 from dotenv import load_dotenv
@@ -306,7 +305,7 @@ async def main() -> None:
     if not BOT_TOKEN:
         raise RuntimeError("Не задан BOT_TOKEN. Создайте .env на основе .env.example.")
     db_init()
-    bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+    bot = Bot(token=BOT_TOKEN)
     dp = Dispatcher()
     dp.include_router(router)
     log.info("Бот запущен, ожидаю сообщения...")
