@@ -500,12 +500,23 @@ async def welcome_new_members(message: Message):
     for user in message.new_chat_members:
         if user.is_bot:
             continue
-        safe_name = html_escape(user.full_name)
-        text = (
-            f'👋 Добро пожаловать, <a href="tg://user?id={user.id}">{safe_name}</a>! '
-            f"Напишите свой игровой ник."
-        )
-        await message.answer(text, parse_mode="HTML")
+        if user.username:
+            # @username всегда кликабелен и присылает уведомление,
+            # не зависит от настроек приватности пользователя.
+            mention = f"@{user.username}"
+            text = f"👋 Добро пожаловать, {mention}! Напишите свой игровой ник."
+            await message.answer(text)
+        else:
+            # Запасной вариант для тех, у кого нет username: ссылка на
+            # профиль. Может не сработать, если у человека в настройках
+            # приватности запрещено добавление такого рода упоминаний —
+            # тогда просто отобразится как обычный текст.
+            safe_name = html_escape(user.full_name)
+            text = (
+                f'👋 Добро пожаловать, <a href="tg://user?id={user.id}">{safe_name}</a>! '
+                f"Напишите свой игровой ник."
+            )
+            await message.answer(text, parse_mode="HTML")
 
 
 @router.message(F.chat.type.in_({"group", "supergroup"}))
