@@ -52,6 +52,7 @@ import time
 from collections import defaultdict, deque
 from contextlib import closing
 from datetime import datetime, timedelta, timezone
+from html import escape as html_escape
 
 from aiogram import Bot, Dispatcher, F, Router
 from aiogram.enums import ChatMemberStatus
@@ -499,11 +500,12 @@ async def welcome_new_members(message: Message):
     for user in message.new_chat_members:
         if user.is_bot:
             continue
-        await message.answer(
-            f"👋 Добро пожаловать, {user.full_name}!\n"
-            f"Напишите, пожалуйста, свой игровой ник, чтобы мы могли вас "
-            f"идентифицировать."
+        safe_name = html_escape(user.full_name)
+        text = (
+            f'👋 Добро пожаловать, <a href="tg://user?id={user.id}">{safe_name}</a>! '
+            f"Напишите свой игровой ник."
         )
+        await message.answer(text, parse_mode="HTML")
 
 
 @router.message(F.chat.type.in_({"group", "supergroup"}))
